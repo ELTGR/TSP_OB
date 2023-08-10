@@ -36,7 +36,13 @@ def test_model(model_name,environnement):
         done = False
         
         bluerov_virtuel.move_to([obs[0],obs[1],0],True)
-    
+        if (env.agt_x, env.agt_y) in (env.order_x, env.order_y) :
+            point1=(obs[0]-0.5,obs[1]+0.5)
+            point2=(obs[0]-0.5,obs[1]-0.5)
+            point3=(obs[0]+0.5,obs[1]+0.5)
+            point4=(obs[0]+0.5,obs[1]-0.5)
+
+            bluerov_virtuel.do_scan(point1,point2,point3,point4,point1)
         
         reward_t=0
         while not done:

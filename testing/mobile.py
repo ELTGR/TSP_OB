@@ -36,3 +36,6 @@ class Bluerov:
     
     def reset_battery(self):
         return self.implementation.reset_battery()
+    
+    def do_scan(self,point1,point2,point3,point4,point5) :
+        self.implementation.do_scan(point1,point2,point3,point4,point5)

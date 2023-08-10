@@ -3,6 +3,7 @@ import math
 
 from testing.bluerov_node import BlueRov 
 # from bluerov_node import BlueRov
+from scan_trajectory  import planning
 
 class BluerovImplementation:
     
@@ -87,3 +88,34 @@ class ArduSubBluerovImplementation(BluerovImplementation):
         dx = self.current_position[0] - waypoint[0]
         dy = self.current_position[1] - waypoint[1]
         self.distance_made += math.hypot(dx,dy)
+      
+    def do_scan(self,point1,point2,point3,point4,point5):
+        ox=[point1[0],point2[0],point3[0],point4[0],point5[0]]
+        oy=[point1[1],point2[1],point3[1],point4[1],point5[1]]
+        px, py = planning(ox, oy, 2)
+        oz = [-7]
+        self.mission_ongoing = True
+        self.mission_scan = True
+        desired_position = [0.0, 0.0, -oz[0], 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+        current_pose = self.current_pose
+        desired_position[0], desired_position[1] = px[self.mission_scan_point], py[self.mission_scan_point]
+
+        if abs(current_pose[0] - desired_position[0]) < 0.2 and abs(current_pose[1] - desired_position[1]) < 0.2:
+            # print("Arrivé au point")
+            if self.mission_scan_point == len(px) - 1:
+                self.ok_pose = True
+                print('Mission de scan terminée !')
+                self.mission_scan_point = 0
+                self.mission_scan = False
+                self.mission_ongoing = False
+                self.mission_point_sent = False
+            else :
+                self.mission_scan_point += 1
+                desired_position[0], desired_position[1] = px[self.mission_scan_point], py[self.mission_scan_point]
+            self.mission_point_sent = False
+
+        if self.mission_point_sent == False:
+            # self.ok_pose = False
+            self.set_position_target_local_ned(desired_position)
+            self.mission_point_sent = True
